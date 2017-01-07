@@ -1,72 +1,48 @@
-$(function () {
-  $("#go").on('click', function () {
+var client = new WebTorrent()
 
-    var torrentId = $("#btlink").val()
+client.on('error', function (err) {
+  console.error('ERROR: ' + err.message)
+})
 
-    var client = new WebTorrent()
+$('button').on('click',function(e){
+  e.preventDefault() // Prevent page refresh
+  var torrentId = document.querySelector('form input[name=torrentId]').value
+  log('Adding ' + torrentId)
+  client.add(torrentId, onTorrent)
+})
 
-    // HTML elements
-    var $body = document.body
-    var $progressBar = document.querySelector('#progressBar')
-    var $numPeers = document.querySelector('#numPeers')
-    var $downloaded = document.querySelector('#downloaded')
-    var $total = document.querySelector('#total')
-    var $remaining = document.querySelector('#remaining')
-    var $uploadSpeed = document.querySelector('#uploadSpeed')
-    var $downloadSpeed = document.querySelector('#downloadSpeed')
+function onTorrent (torrent) {
+  log('Got torrent metadata!')
+  log(
+    'Torrent info hash: ' + torrent.infoHash + ' ' +
+    '<a href="' + torrent.magnetURI + '" target="_blank">[Magnet URI]</a> ' +
+    '<a href="' + torrent.torrentFileBlobURL + '" target="_blank" download="' + torrent.name + '.torrent">[Download .torrent]</a>'
+  )
 
-    // Download the torrent
-    client.add(torrentId, function (torrent) {
+  // Print out progress every 5 seconds
+  var interval = setInterval(function () {
+    log('Progress: ' + (torrent.progress * 100).toFixed(1) + '%')
+  }, 5000)
 
-      // Stream the file in the browser
-      torrent.files[0].appendTo('#output')
+  torrent.on('done', function () {
+    log('Progress: 100%')
+    clearInterval(interval)
+  })
 
-      // Trigger statistics refresh
-      torrent.on('done', onDone)
-      setInterval(onProgress, 500)
-      onProgress()
-
-      // Statistics
-      function onProgress() {
-        // Peers
-        $numPeers.innerHTML = torrent.numPeers + (torrent.numPeers === 1 ? ' peer' : ' peers')
-
-        // Progress
-        var percent = Math.round(torrent.progress * 100 * 100) / 100
-        $progressBar.style.width = percent + '%'
-        $downloaded.innerHTML = prettyBytes(torrent.downloaded)
-        $total.innerHTML = prettyBytes(torrent.length)
-
-        // Remaining time
-        var remaining
-        if (torrent.done) {
-          remaining = 'Done.'
-        } else {
-          remaining = moment.duration(torrent.timeRemaining / 1000, 'seconds').humanize()
-          remaining = remaining[0].toUpperCase() + remaining.substring(1) + ' remaining.'
-        }
-        $remaining.innerHTML = remaining
-
-        // Speed rates
-        $downloadSpeed.innerHTML = prettyBytes(torrent.downloadSpeed) + '/s'
-        $uploadSpeed.innerHTML = prettyBytes(torrent.uploadSpeed) + '/s'
-      }
-      function onDone() {
-        $body.className += ' is-seed'
-        onProgress()
-      }
+  // Render all files into to the page
+  torrent.files.forEach(function (file) {
+    file.appendTo('.log')
+    log('(Blob URLs only work if the file is loaded from a server. "http//localhost" works. "file://" does not.)')
+    file.getBlobURL(function (err, url) {
+      if (err) return log(err.message)
+      log('File done.')
+      log('<a href="' + url + '">Download full file: ' + file.name + '</a>')
     })
+  })
+}
 
-    // Human readable bytes util
-    function prettyBytes(num) {
-      var exponent, unit, neg = num < 0, units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-      if (neg) num = -num
-      if (num < 1) return (neg ? '-' : '') + num + ' B'
-      exponent = Math.min(Math.floor(Math.log(num) / Math.log(1000)), units.length - 1)
-      num = Number((num / Math.pow(1000, exponent)).toFixed(2))
-      unit = units[exponent]
-      return (neg ? '-' : '') + num + ' ' + unit
-    }
-
-  });
-});
+function log (str) {
+  var p = document.createElement('p')
+  p.innerHTML = str
+  document.querySelector('.log').appendChild(p)
+}
