@@ -2,6 +2,7 @@
 
 在线直播Bt种子，后端未动 前端先行
 
+![](https://i.imgur.com/nlxWTMV.png)
 
 ## 如何使用
 
