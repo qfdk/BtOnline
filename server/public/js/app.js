@@ -4,7 +4,7 @@ client.on('error', function (err) {
   console.error('ERROR: ' + err.message)
 })
 
-$('button').on('click',function(e){
+$('button').on('click',function (e){
   e.preventDefault() // Prevent page refresh
   var torrentId = document.querySelector('form input[name=torrentId]').value
   log('Adding ' + torrentId)
