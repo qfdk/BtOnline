@@ -1,15 +1,17 @@
-# WebUI for fuzzing-api
+# WebUI for BtOnline
 
 ## Build Setup
 
 ``` bash
 # install dependencies
+# 安装所有的库
 npm install
 
 # serve with hot reload at localhost:8000
 npm run dev
 
 # build for production with minification
+# 生产模式 最后打包在dist文件夹里面，复制到wwwroot下
 npm run build
 ```
 > Tip:
