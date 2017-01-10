@@ -1,17 +1,25 @@
 var client = new WebTorrent()
 
+DragDrop('body', function (files) {
+  client.seed(files, function (torrent) {
+    log('拖拽文件:'+torrent.name)
+    log('正在做种:'+torrent.magnetURI)
+    log('hash:'+torrent.infoHash)
+  })
+})
+
 client.on('error', function (err) {
   console.error('ERROR: ' + err.message)
 })
 
-$('button').on('click',function (e){
-  e.preventDefault() // Prevent page refresh
+$('button').on('click', function (e) {
+  e.preventDefault()
   var torrentId = document.querySelector('form input[name=torrentId]').value
   log('Adding ' + torrentId)
   client.add(torrentId, onTorrent)
 })
 
-function onTorrent (torrent) {
+function onTorrent(torrent) {
   log('Got torrent metadata!')
   log(
     'Torrent info hash: ' + torrent.infoHash + ' ' +
@@ -41,7 +49,7 @@ function onTorrent (torrent) {
   })
 }
 
-function log (str) {
+function log(str) {
   var p = document.createElement('p')
   p.innerHTML = str
   document.querySelector('.log').appendChild(p)

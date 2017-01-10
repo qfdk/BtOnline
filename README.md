@@ -41,5 +41,10 @@ git clone https://github.com/qfdk/BtOnline.git
 
 ## Credit
 
-[webtorrent](https://github.com/feross/webtorrent)
-[torrent-stream](https://github.com/mafintosh/torrent-stream)
+- [webtorrent](https://github.com/feross/webtorrent)
+
+- [torrent-stream](https://github.com/mafintosh/torrent-stream)
+
+## License
+
+MIT. Copyright (c) [BtOnline](http://bt.qfdk.me), LLC.
