@@ -1,10 +1,11 @@
 var client = new WebTorrent()
+var socket = io.connect("http://" + window.location['hostname'] + ":3000");
 
 DragDrop('body', function (files) {
   client.seed(files, function (torrent) {
-    log('拖拽文件:'+torrent.name)
-    log('正在做种:'+torrent.magnetURI)
-    log('hash:'+torrent.infoHash)
+    log('拖拽文件:' + torrent.name)
+    log('正在做种:' + torrent.magnetURI)
+    log('Hash:' + torrent.infoHash)
   })
 })
 
@@ -12,7 +13,27 @@ client.on('error', function (err) {
   console.error('ERROR: ' + err.message)
 })
 
-$('button').on('click', function (e) {
+$('#download').on('click', function (e) {
+  e.preventDefault()
+  var torrentId = document.querySelector('form input[name=torrentId]').value
+  // var url = "http://" + window.location['hostname'] + ":3000/download?url=" + torrentId
+  socket.emit('download', { torrentId: torrentId })
+
+  // $.get(url, function (data) {
+  //   console.log('///todo');
+  // })
+
+})
+
+socket.on('showInfo', function (data) {
+  var tmp = JSON.parse(data)
+  console.log(tmp)
+  log(tmp.name + "--" + tmp.downSpeed + " /S")
+
+})
+
+
+$('#online').on('click', function (e) {
   e.preventDefault()
   var torrentId = document.querySelector('form input[name=torrentId]').value
   log('Adding ' + torrentId)
@@ -52,5 +73,8 @@ function onTorrent(torrent) {
 function log(str) {
   var p = document.createElement('p')
   p.innerHTML = str
-  document.querySelector('.log').appendChild(p)
+  var para = document.createElement("p");
+  para.appendChild(p);
+  var element = document.querySelector('.log');
+  element.insertBefore(para, element.firstChild);
 }

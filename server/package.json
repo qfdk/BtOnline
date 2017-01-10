@@ -1,5 +1,5 @@
 {
-  "name": "btoOnline",
+  "name": "btonline",
   "version": "1.0.0",
   "description": "bt online",
   "main": "server.js",
@@ -16,8 +16,8 @@
     "chai": "^3.5.0",
     "ejs": "^2.4.1",
     "express": "^4.13.4",
-    "request": "^2.79.0",
     "serve-favicon": "^2.3.0",
-    "socket.io": "^1.4.5"
+    "socket.io": "^1.4.5",
+    "webtorrent": "^0.98.0"
   }
 }
