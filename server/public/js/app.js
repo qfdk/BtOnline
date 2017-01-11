@@ -59,7 +59,7 @@ function onTorrent(torrent) {
     $('.progress-bar').attr('aria-valuenow', tmp)
     $('.progress-bar').attr('style', 'width:' + tmp + '%')
     $('.progress-bar').html(tmp + ' %')
-    $('#speed').html(torrent.downSpeed+'/S')
+    $('#speed').html(prettyBytes(torrent.downloadSpeed)+'/S')
     // log('Progress: ' + (torrent.progress * 100).toFixed(1) + '%')
   }, 5000)
 
@@ -87,4 +87,18 @@ function log(str) {
   para.appendChild(p);
   var element = document.querySelector('.log');
   element.insertBefore(para, element.firstChild);
+}
+
+/**
+ * 转换并显示下载速度
+ * show the downloadSpeed for human
+ */
+function prettyBytes(num) {
+  var exponent, unit, neg = num < 0, units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+  if (neg) num = -num
+  if (num < 1) return (neg ? '-' : '') + num + ' B'
+  exponent = Math.min(Math.floor(Math.log(num) / Math.log(1000)), units.length - 1)
+  num = Number((num / Math.pow(1000, exponent)).toFixed(2))
+  unit = units[exponent]
+  return (neg ? '-' : '') + num + ' ' + unit
 }
