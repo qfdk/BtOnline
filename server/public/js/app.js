@@ -50,7 +50,11 @@ function onTorrent(torrent) {
 
   // Print out progress every 5 seconds
   var interval = setInterval(function () {
-    log('Progress: ' + (torrent.progress * 100).toFixed(1) + '%')
+    var tmp=(torrent.progress * 100).toFixed(1);
+    $('.progress-bar').attr('aria-valuenow',tmp)
+    $('.progress-bar').attr('style','width:'+tmp+'%')
+    $('.progress-bar').html(tmp+' %')
+    // log('Progress: ' + (torrent.progress * 100).toFixed(1) + '%')
   }, 5000)
 
   torrent.on('done', function () {
