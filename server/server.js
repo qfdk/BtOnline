@@ -85,6 +85,7 @@ io.sockets.on('connection', function (socket) {
           setInterval(function () {
             result['name'] = file.name
             result['downSpeed'] = prettyBytes(torrent.downloadSpeed)
+            result['progress']=torrent.progress
             io.sockets.emit('showInfo', JSON.stringify(result))
           }, 500)
         }, this);

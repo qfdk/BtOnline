@@ -26,9 +26,14 @@ $('#download').on('click', function (e) {
 })
 
 socket.on('showInfo', function (data) {
-  var tmp = JSON.parse(data)
-  console.log(tmp)
-  log(tmp.name + "--" + tmp.downSpeed + " /S")
+  var json = JSON.parse(data)
+  var tmp = (json.progress * 100).toFixed(1);
+  $('.progress-bar').attr('aria-valuenow', tmp)
+  $('.progress-bar').attr('style', 'width:' + tmp + '%')
+  $('.progress-bar').html(tmp + '%')
+  $('#speed').html(json.downSpeed+'/S')
+  // console.log(tmp)
+  // log(tmp.name + "--" + tmp.downSpeed + " /S")
 
 })
 
@@ -50,10 +55,11 @@ function onTorrent(torrent) {
 
   // Print out progress every 5 seconds
   var interval = setInterval(function () {
-    var tmp=(torrent.progress * 100).toFixed(1);
-    $('.progress-bar').attr('aria-valuenow',tmp)
-    $('.progress-bar').attr('style','width:'+tmp+'%')
-    $('.progress-bar').html(tmp+' %')
+    var tmp = (torrent.progress * 100).toFixed(1);
+    $('.progress-bar').attr('aria-valuenow', tmp)
+    $('.progress-bar').attr('style', 'width:' + tmp + '%')
+    $('.progress-bar').html(tmp + ' %')
+    $('#speed').html(torrent.downSpeed+'/S')
     // log('Progress: ' + (torrent.progress * 100).toFixed(1) + '%')
   }, 5000)
 
