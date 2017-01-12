@@ -19,10 +19,6 @@ $('#download').on('click', function (e) {
   // var url = "http://" + window.location['hostname'] + ":3000/download?url=" + torrentId
   socket.emit('download', { torrentId: torrentId })
 
-  // $.get(url, function (data) {
-  //   console.log('///todo');
-  // })
-
 })
 
 socket.on('showInfo', function (data) {
@@ -32,9 +28,6 @@ socket.on('showInfo', function (data) {
   $('.progress-bar').attr('style', 'width:' + tmp + '%')
   $('.progress-bar').html(tmp + '%')
   $('#speed').html(json.downSpeed+'/S')
-  // console.log(tmp)
-  // log(tmp.name + "--" + tmp.downSpeed + " /S")
-
 })
 
 

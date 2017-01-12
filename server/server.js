@@ -38,26 +38,6 @@ app.get('/', function (req, res) {
   res.render('index')
 })
 
-/**
- * download ...
- */
-// app.get('/download', function (req, res) {
-//   var torrentId = req.param('url')
-//   if (('undefined' !== torrentId) && !isExsitedTorrentID(torrentId)) {
-//     listTorrents.push(torrentId)
-//     client.add(torrentId, config, function (torrent) {
-//       var files = torrent.files;
-//       files.forEach(function (file) {
-//         console.log(file.name + "==>" + torrent.downloadSpeed)
-//       }, this);
-//     })
-//   } else {
-//     console.log(prettyBytes(client.downloadSpeed));
-//   }
-//   res.render('index')
-// })
-
-
 io.sockets.on('connection', function (socket) {
 
   if (sockets.indexOf(socket) === -1) {
@@ -85,16 +65,12 @@ io.sockets.on('connection', function (socket) {
           setInterval(function () {
             result['name'] = file.name
             result['downSpeed'] = prettyBytes(torrent.downloadSpeed)
-            result['progress']=torrent.progress
+            result['progress'] = torrent.progress
+            result['timeRemaining'] = torrent.timeRemaining
             io.sockets.emit('showInfo', JSON.stringify(result))
-          }, 500)
+          }, 5000)
         }, this);
       })
-    } else {
-      // todo 
-      setInterval(function () {
-        io.sockets.emit('showInfo', JSON.stringify(result))
-      }, 500)
     }
   });
 
@@ -102,6 +78,7 @@ io.sockets.on('connection', function (socket) {
     var indexSocket = sockets.indexOf(socket);
     if (indexSocket !== -1) {
       sockets.splice(indexSocket, 1)
+      console.log(socket+'离开');
     }
   });
 })
