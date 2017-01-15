@@ -8,7 +8,7 @@ var path = require('path')
 var favicon = require('serve-favicon')
 var WebTorrent = require('webtorrent')
 var client = new WebTorrent()
-
+var dirPort = config.dirPort
 var listTorrents = []
 var sockets = []; // Liste des sockets client
 
@@ -55,6 +55,8 @@ io.sockets.on('connection', function (socket) {
        * 开始下载
        */
       client.add(torrentId, config, function (torrent) {
+        var server = torrent.createServer()
+        server.listen(dirPort)
         var files = torrent.files;
         files.forEach(function (file) {
           console.log(file.name)
@@ -70,6 +72,8 @@ io.sockets.on('connection', function (socket) {
             io.sockets.emit('showInfo', JSON.stringify(result))
           }, 5000)
         }, this);
+        server.close()
+        client.destroy()
       })
     }
   });
@@ -78,7 +82,7 @@ io.sockets.on('connection', function (socket) {
     var indexSocket = sockets.indexOf(socket);
     if (indexSocket !== -1) {
       sockets.splice(indexSocket, 1)
-      console.log(socket+'离开');
+      console.log(socket + '离开');
     }
   });
 })
