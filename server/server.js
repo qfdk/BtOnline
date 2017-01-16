@@ -7,10 +7,13 @@ var io = require('socket.io')(server)
 var path = require('path')
 var favicon = require('serve-favicon')
 var WebTorrent = require('webtorrent')
+var sleep = require('sleep')
 var client = new WebTorrent()
 var dirPort = config.dirPort
 var listTorrents = []
 var sockets = []; // Liste des sockets client
+
+var isDownloading = true
 
 // ------------express-------------------
 app.set('views', path.join(__dirname, 'views'))
@@ -46,35 +49,49 @@ io.sockets.on('connection', function (socket) {
   }
 
   socket.on('download', function (data) {
-    var result = {}
     var torrentId = data.torrentId
-    console.log(torrentId);
     if (('undefined' !== torrentId) && !isExsitedTorrentID(torrentId)) {
       listTorrents.push(torrentId)
       /**
        * 开始下载
        */
       client.add(torrentId, config, function (torrent) {
-        var server = torrent.createServer()
-        server.listen(dirPort)
         var files = torrent.files;
         files.forEach(function (file) {
-          console.log(file.name)
-          /**
-           * 每5S给前端发送下载速度
-           * 需要验证是否下载完成。/todo
-           */
           setInterval(function () {
-            result['name'] = file.name
+            var result = {}
+            result['isDownloading'] = true
+            result['file'] = file.name
             result['downSpeed'] = prettyBytes(torrent.downloadSpeed)
             result['progress'] = torrent.progress
             result['timeRemaining'] = torrent.timeRemaining
             io.sockets.emit('showInfo', JSON.stringify(result))
-          }, 5000)
+          }, 500)
+
         }, this);
-        server.close()
-        client.destroy()
+
+        torrent.on('done', function () {
+          console.log('torrent finished downloading');
+          isDownloading = false
+          torrent.files.forEach(function (file) {
+            console.log(file.name + ' 完成');
+            var server = torrent.createServer()
+            server.listen(dirPort)
+          })
+          var result = {}
+          result['isDownloading'] = false
+          result['downSpeed'] = prettyBytes(torrent.downloadSpeed)
+          result['progress'] = torrent.progress
+          result['timeRemaining'] = torrent.timeRemaining
+          io.sockets.emit('showInfo', JSON.stringify(result))
+        })
+        // server.close()
+        // client.destroy()
       })
+    } else {
+      console.log('已经下载完成');
+      var server = torrent.createServer()
+      server.listen(dirPort)
     }
   });
 
@@ -82,7 +99,7 @@ io.sockets.on('connection', function (socket) {
     var indexSocket = sockets.indexOf(socket);
     if (indexSocket !== -1) {
       sockets.splice(indexSocket, 1)
-      console.log(socket + '离开');
+      console.log(socket.id + '离开');
     }
   });
 })

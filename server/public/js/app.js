@@ -23,11 +23,20 @@ $('#download').on('click', function (e) {
 
 socket.on('showInfo', function (data) {
   var json = JSON.parse(data)
-  var tmp = (json.progress * 100).toFixed(1);
-  $('.progress-bar').attr('aria-valuenow', tmp)
-  $('.progress-bar').attr('style', 'width:' + tmp + '%')
-  $('.progress-bar').html(tmp + '%')
-  $('#speed').html(json.downSpeed+'/S')
+  if (json.isDownloading==='true') {
+    var tmp = (json.progress * 100).toFixed(1);
+    $('.progress-bar').attr('aria-valuenow', tmp)
+    $('.progress-bar').attr('style', 'width:' + tmp + '%')
+    $('.progress-bar').html(tmp + '%')
+    $('#speed').html(json.downSpeed + '/S')
+  } else {
+    $('.progress-bar').attr('aria-valuenow', 100)
+    $('.progress-bar').attr('style', 'width:100%')
+    $('.progress-bar').html( '100% 下载完成')
+    $('#speed').html('访问http://' + window.location['hostname'] + ':8888进行查看')
+  }
+
+
 })
 
 
@@ -52,7 +61,7 @@ function onTorrent(torrent) {
     $('.progress-bar').attr('aria-valuenow', tmp)
     $('.progress-bar').attr('style', 'width:' + tmp + '%')
     $('.progress-bar').html(tmp + ' %')
-    $('#speed').html(prettyBytes(torrent.downloadSpeed)+'/S')
+    $('#speed').html(prettyBytes(torrent.downloadSpeed) + '/S')
     // log('Progress: ' + (torrent.progress * 100).toFixed(1) + '%')
   }, 5000)
 
