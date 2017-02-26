@@ -44,6 +44,7 @@ io.sockets.on('connection', function (socket) {
   }
 
   socket.on('download', function (data) {
+    isDownloading = true
     var torrentId = data.torrentId
     if ((torrentId !== 'undefined') && !isExsitedTorrentID(torrentId)) {
       listTorrents.push(torrentId)
